@@ -4,6 +4,7 @@ import functools
 import datetime
 from decimal import Decimal
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
@@ -14,6 +15,8 @@ from libcovebods.config import LibCoveBODSConfig
 from libcove.lib.exceptions import CoveInputDataError
 from cove.views import explore_data_context
 from libcove.lib.converters import convert_spreadsheet, convert_json
+
+from cove_bods.models import BODSPersonStatementJSON, BODSEntityStatementJSON, BODSOwnershipStatementJSON
 from cove_project import settings
 
 logger = logging.getLogger(__name__)
@@ -116,5 +119,45 @@ def explore_bods(request, pk):
         context['statistics']['count_entity_statements_types']['legalEntity'])
 
     template = 'cove_bods/explore.html'
+
+    # If we don't have validation errors
+    if settings.DATABASES.get("bluetail"):
+        if not context["validation_errors"]:
+            for statement in context["json_data"]:
+                # dump and load json to fix datetimes
+                json_string = json.dumps(
+                    statement,
+                    sort_keys=True,
+                    indent=1,
+                    cls=DjangoJSONEncoder
+                )
+                statement_json = json.loads(json_string)
+                statement_id = statement_json.get("statementID")
+                statement_type = statement_json.get("statementType")
+                if statement_type == "personStatement":
+                    BODSPersonStatementJSON.objects.update_or_create(
+                        statement_id=statement_id,
+                        defaults={
+                            "statement_id": statement_id,
+                            "statement_json": statement_json,
+                        }
+                    )
+                elif statement_type == "entityStatement":
+                    BODSEntityStatementJSON.objects.update_or_create(
+                        statement_id=statement_id,
+                        defaults={
+                            "statement_id": statement_id,
+                            "statement_json": statement_json,
+                        }
+                    )
+                elif statement_type == "ownershipOrControlStatement":
+                    BODSOwnershipStatementJSON.objects.update_or_create(
+                        statement_id=statement_id,
+                        defaults={
+                            "statement_id": statement_id,
+                            "statement_json": statement_json,
+                        }
+                    )
+
 
     return render(request, template, context)

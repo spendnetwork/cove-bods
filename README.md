@@ -59,12 +59,25 @@ To check that all new text is written so that it is able to be translated you co
     django-template-i18n-lint cove
     
     
-### Deploy to Heroku
+### Deploying to Heroku
 
-- Create Heroku app
-- Provision Heroku Postgres addon (Or set `DATABASE_URL` variable to point to desired postgres DB)
-- Set Env var 
+1. Create Heroku app
+2. Provision Heroku Postgres addon (Or set `DATABASE_URL` variable to point to desired postgres DB)
+3. Set Env var 
     
-    ALLOWED_HOSTS=['*']
+        ALLOWED_HOSTS=['*']
     
-- Deploy app
+4. Deploy app
+5. Run migrations
+
+        heroku run "python manage.py migrate" --app [your-heroku-app-name]
+    
+    
+### Save valid input to Bluetail
+
+1. Set database URL for Bluetail
+
+        BLUETAIL_DATABASE_URL=""
+ 
+
+        

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+
+import dj_database_url
 from cove import settings
 import environ
 
@@ -77,13 +79,26 @@ WSGI_APPLICATION = 'cove_project.wsgi.application'
 
 # We can't take DATABASES from cove settings,
 # ... otherwise the files appear under the BASE_DIR that is the Cove library install.
-# That could get messy. We want them to appear in our directory.
+# That could get messy. We want them to appear in our directory..
+
+# # TODO Set up better method for switching default or configure local postgres
+if os.getenv("DATABASE_URL"):
+    default_db = env.db()
+else:
+    default_db = {"ENGINE": "django.db.backends.sqlite3", "NAME": env("DB_NAME")}
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': env('DB_NAME'),
-    }
+    "default": default_db
 }
+
+# Add database for bluetail output
+if os.getenv("BLUETAIL_DATABASE_URL"):
+    DATABASES["bluetail"] = dj_database_url.config(env="BLUETAIL_DATABASE_URL")
+    # DATABASES["ocds_db"]['OPTIONS'] = {'options': '-c search_path=es_indexes'}
+
+DATABASE_ROUTERS = ['cove_project.db_routers.DataRouter']
+DEFAULT_DB_ALIAS = 'default'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
