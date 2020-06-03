@@ -57,3 +57,14 @@ To check that all new text is written so that it is able to be translated you co
 
     pip install django-template-i18n-lint
     django-template-i18n-lint cove
+    
+    
+### Deploy to Heroku
+
+- Create Heroku app
+- Provision Heroku Postgres addon (Or set `DATABASE_URL` variable to point to desired postgres DB)
+- Set Env var 
+    
+    ALLOWED_HOSTS=['*']
+    
+- Deploy app
