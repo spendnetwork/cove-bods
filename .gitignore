@@ -4,3 +4,4 @@
 *.mo
 __pycache__
 /media
+*.env

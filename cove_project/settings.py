@@ -31,10 +31,11 @@ GOOGLE_ANALYTICS_ID = settings.GOOGLE_ANALYTICS_ID
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-DEALER_TYPE = settings.DEALER_TYPE
+# Heroku doesn't have git support when deploying
+DEALER_TYPE = 'null'
 SECRET_KEY = settings.SECRET_KEY
 DEBUG = settings.DEBUG
-ALLOWED_HOSTS = settings.ALLOWED_HOSTS
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
 # Application definition
 
@@ -61,6 +62,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'dealer.contrib.django.Middleware',
     'cove.middleware.CoveConfigCurrentApp',
